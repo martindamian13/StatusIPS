@@ -21,6 +21,7 @@ def verificarCI(Cedula):
     boton.click()
     time.sleep(0.5)
 
+    # Verificar el estado de la persona
     mensaje = driver.find_element(by=By.CSS_SELECTOR, value="#divResultados > p.pMensajeOK")
     if mensaje.text == "El Nro CIC pertenece a un asegurado cotizante en el IPS no puede generar la constancia.":
         return True
