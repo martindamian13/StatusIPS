@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - CODAS VUYK</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="flex flex-col min-h-screen w-screen bg-cover bg-center" style="background-image: url('https://www.codasvuyk.com.py/img/inicio/1.jpg');">
+    <div class="container mx-auto p-4">
+        <!-- Header -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6 flex flex-col items-center text-center">
+            <img src="https://www.codasvuyk.com.py/img/codas-vuyk.png" class="mb-4">
+            <h2 class="text-2xl font-bold mb-4">Sistema automatizado de verificacion de estado IPS</h2>
+        </div>
+        <!-- Content here -->
+        {% block content %}
+        
+        {% endblock %}
+    </div>
+    <!-- Footer -->
+    <footer class="bg-white py-4 mt-auto">
+        <div class="container mx-auto text-center">
+            <p class="text-sm text-gray-600">&copy; 2025 Martin Quintana. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+</body>
+</html>
