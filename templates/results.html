@@ -1,30 +1,61 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultados</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100">
-    <div class="container mx-auto p-4">
-        <h1 class="text-2xl font-bold mb-4">Resultados</h1>
-        <table class="table-auto w-full">
-            <thead>
-                <tr>
-                    <th class="px-4 py-2">ID</th>
-                    <th class="px-4 py-2">Resultado</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for result in results %}
-                <tr>
-                    <td class="border px-4 py-2">{{ results[0] }}</td>
-                    <td class="border px-4 py-2">{{ results[1] }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %} Resultados {% endblock %}
+{% block content %}
+<!-- Resumen general -->
+<div class="bg-white p-6 rounded-lg shadow-md mb-6">
+    <h2 class="text-2xl font-bold mb-4">Resumen</h2>
+    <p class="text-lg">
+        Total de personas: <span class="font-bold">{{ total_asegurados + total_no_asegurados + no_chequeados }}</span>
+        Asegurados: <span class="font-bold">{{ total_asegurados }}</span>
+        No asegurados: <span class="font-bold">{{ total_no_asegurados }}</span>
+        No chequeados: <span class="font-bold">{{ no_chequeados }}</span>
+    </p>
+</div>
+
+<!-- Tabla de no asegurados -->
+<div class="bg-white p-6 rounded-lg shadow-md mb-6">
+    <h2 class="text-2xl font-bold mb-4">No Asegurados</h2>
+    <table class="table-auto w-full">
+        <thead>
+            <tr class="bg-gray-200">
+                <th class="px-4 py-2">ID</th>
+                <th class="px-4 py-2">Nombre</th>
+                <th class="px-4 py-2">Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for persona in resultados.no_asegurados %}
+            <tr>
+                <td class="border px-4 py-2">{{ persona.id }}</td>
+                <td class="border px-4 py-2">{{ persona.name }}</td>
+                <td class="border px-4 py-2">{{ persona.date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Tabla de no chequeados -->
+<div class="bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-4">No Chequeados</h2>
+    <table class="table-auto w-full">
+        <thead>
+            <tr class="bg-gray-200">
+                <th class="px-4 py-2">ID</th>
+                <th class="px-4 py-2">Nombre</th>
+                <th class="px-4 py-2">Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for persona in resultados.no_checkeados %}
+            <tr>
+                <td class="border px-4 py-2">{{ persona.id }}</td>
+                <td class="border px-4 py-2">{{ persona.name }}</td>
+                <td class="border px-4 py-2">{{ persona.date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+{% endblock %}
