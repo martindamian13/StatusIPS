@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 
-def parse_xml(file, fecha_a):
+def parse_xml(file, dia):
     # Parsear el XML
     tree = ET.parse(file)
     root = tree.getroot()
@@ -29,13 +29,29 @@ def parse_xml(file, fecha_a):
             if t_num_cedula is not None:
                 cedula = t_num_cedula.text  # Segunda columna (Id. de Usuario)
             if t_nombre is not None:
-                name = t_nombre.text      # Tercera columna (Nombre)
+                name = t_nombre.text    # Tercera columna (Nombre)
+                nombre, company = separar_texto(name)
             if t_fecha is not None:
                 timestamp = t_fecha.text # Cuarta columna (Hora de Apertura)
                 fecha = timestamp.split(" ")[0] # Extraer solo la fecha
-            if fecha == fecha_a:
-                data.append({"id": cedula,"name": name,"date": fecha})
+            if fecha == dia:
+                data.append({"id": cedula,
+                            "name": nombre,
+                            "date": fecha,
+                            "company": company})
     return data
+
+def separar_texto(texto):
+    if not texto:  # Verifica si es None o cadena vacía
+        return None, None
+    
+    partes = texto.split("_", 1)  # Divide en máximo 2 partes
+
+    nombre = partes[0].strip()
+    company = partes[1].strip() if len(partes) > 1 else None  # Si no hay segunda parte, company es None
+
+    return nombre, company
+
 
 def check_status(num_cedula):
     url = "https://servicios.ips.gov.py/constancias_aop/controladores/funcionesConstanciasAsegurados.php?opcion=consultarAsegurado"
@@ -68,7 +84,10 @@ def resultado(data):
         else:
             no_checkeados.append(item)
         print('Checking...')
-    results = {'asegurados': asegurados, 'no_asegurados': no_asegurados, 'no_checkeados':no_checkeados}
+    results = {'asegurados': asegurados, 
+               'no_asegurados': no_asegurados, 
+               'no_checkeados':no_checkeados
+               }
     return results
 
 @app.route('/')
@@ -85,15 +104,11 @@ def upload_file():
         total_asegurados = len(resultados['asegurados'])
         total_no_asegurados = len(resultados['no_asegurados'])
         no_checkeados = len(resultados['no_checkeados'])
-    return render_template('results.html', resultados = resultados, total_asegurados = total_asegurados,total_no_asegurados = total_no_asegurados, no_chequeados = no_checkeados)
-
-@app.route('/resultados')
-def resultados():
-    resultados = []
-    total_checkeados = []
-    no_checkeados = []
-    return render_template('results.html', resultados = resultados, total_checkeados = total_checkeados, no_checkeados = no_checkeados)
-
+    return render_template('results.html', 
+                            resultados = resultados,
+                            total_asegurados = total_asegurados,
+                            total_no_asegurados = total_no_asegurados, 
+                            no_chequeados = no_checkeados)
 
 if __name__ == '__main__':
     app.run(debug=True)
