@@ -1,5 +1,7 @@
 #Project related
 Card_Punch_Records_0.xml
+extraccion.py
+main.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
