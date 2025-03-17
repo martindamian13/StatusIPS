@@ -1,11 +1,16 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, url_for, send_file
+
+import os
+import requests
 
 import xml.etree.ElementTree as ET
-
-import requests
+import pandas as pd
 from bs4 import BeautifulSoup
+from io import BytesIO
 
 app = Flask(__name__)
+
+db = {}
 
 def parse_xml(file, dia):
     # Parsear el XML
@@ -84,10 +89,16 @@ def resultado(data):
         else:
             no_checkeados.append(item)
         print('Checking...')
-    results = {'asegurados': asegurados, 
-               'no_asegurados': no_asegurados, 
-               'no_checkeados':no_checkeados
+    
+    sorted_asegurados = sorted(asegurados, key=lambda x:x['company'])
+    sorted_no_asegurados = sorted(no_asegurados, key=lambda x: x['company'])
+    sorted_no_checkeados = sorted(no_checkeados, key=lambda x: x['company'])
+    results = {'asegurados': sorted_asegurados, 
+               'no_asegurados':sorted_no_asegurados, 
+               'no_checkeados':sorted_no_checkeados
                }
+    global db
+    db = results
     return results
 
 @app.route('/')
@@ -109,6 +120,39 @@ def upload_file():
                             total_asegurados = total_asegurados,
                             total_no_asegurados = total_no_asegurados, 
                             no_chequeados = no_checkeados)
+
+# Ruta para descargar el archivo Excel
+@app.route('/download-excel')
+def download_excel():
+    # Simulación de resultados (reemplaza con tu lógica real)
+    global db
+
+    # Crear un DataFrame de Pandas con los resultados
+    data = []
+    for categoria, personas in db.items():
+        for persona in personas:
+            data.append({
+                'Categoría': categoria,
+                'ID': persona['id'],
+                'Nombre': persona['name'],
+                'Contratista': persona['company'],
+                'Fecha': persona['date']
+            })
+    df = pd.DataFrame(data)
+
+    # Crear un archivo Excel en memoria
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Resultados')
+    output.seek(0)
+
+    # Devolver el archivo Excel como una descarga
+    return send_file(
+        output,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name='resultados.xlsx'
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)
