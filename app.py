@@ -90,9 +90,9 @@ def resultado(data):
             no_checkeados.append(item)
         print('Checking...')
     
-    sorted_asegurados = sorted(asegurados, key=lambda x:x['company'])
-    sorted_no_asegurados = sorted(no_asegurados, key=lambda x: x['company'])
-    sorted_no_checkeados = sorted(no_checkeados, key=lambda x: x['company'])
+    sorted_asegurados = sorted(asegurados, key=lambda x:x['company'] or '')
+    sorted_no_asegurados = sorted(no_asegurados, key=lambda x: x['company'] or '')
+    sorted_no_checkeados = sorted(no_checkeados, key=lambda x: x['company'] or '')
     results = {'asegurados': sorted_asegurados, 
                'no_asegurados':sorted_no_asegurados, 
                'no_checkeados':sorted_no_checkeados
