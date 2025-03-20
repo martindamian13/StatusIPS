@@ -7,12 +7,13 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 from bs4 import BeautifulSoup
 from io import BytesIO
+from datetime import datetime
 
 app = Flask(__name__)
 
 db = {}
 
-def parse_xml(file, dia):
+def parse_xml(file, fecha_inicio, fecha_fin):
     # Parsear el XML
     tree = ET.parse(file)
     root = tree.getroot()
@@ -39,11 +40,20 @@ def parse_xml(file, dia):
             if t_fecha is not None:
                 timestamp = t_fecha.text # Cuarta columna (Hora de Apertura)
                 fecha = timestamp.split(" ")[0] # Extraer solo la fecha
-            if fecha == dia:
-                data.append({"id": cedula,
-                            "name": nombre,
-                            "date": fecha,
-                            "company": company})
+            if t_fecha is not None:
+                timestamp = t_fecha.text # Cuarta columna (Hora de Apertura)
+                fecha = timestamp.split(" ")[0] # Extraer solo la fecha
+                # Convertir la fecha a un objeto datetime para comparación
+                fecha_dt = datetime.strptime(fecha, "%Y-%m-%d")
+                fecha_inicio_dt = datetime.strptime(fecha_inicio, "%Y-%m-%d")
+                fecha_fin_dt = datetime.strptime(fecha_fin, "%Y-%m-%d")
+                
+                # Filtrar por rango de fechas
+                if fecha_inicio_dt <= fecha_dt <= fecha_fin_dt:
+                    data.append({"id": cedula,
+                                "name": nombre,
+                                "date": fecha,
+                                "company": company})
     return data
 
 def separar_texto(texto):
@@ -109,8 +119,9 @@ def index():
 def upload_file():
     if request.method == 'POST':
         file = request.files['file']
-        fecha = request.form.get('fecha')
-        parsed_file = parse_xml(file, fecha)
+        fecha_inicio = request.form['fecha_inicio']
+        fecha_fin = request.form['fecha_fin']
+        parsed_file = parse_xml(file, fecha_inicio, fecha_fin)
         resultados = resultado(parsed_file)
         total_asegurados = len(resultados['asegurados'])
         total_no_asegurados = len(resultados['no_asegurados'])
